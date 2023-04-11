@@ -47,7 +47,7 @@ runs:
       - name: Fetch review logic
         uses: wei/wget@v1
         with:
-          args: -O review.py https://raw.githubusercontent.com/mono-chrome/GPTReviewWorkflow/main/review.py
+          args: -O review.py https://raw.githubusercontent.com/suarezafelipe/GPTReviewWorkflow/main/review.py
       - name: Review PR and make comment
         shell: bash
         run: |
