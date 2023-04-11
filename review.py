@@ -27,17 +27,22 @@ def get_review():
     prompt = intro + explanation + patch_info + task_headline + task_list
 
     print(f"\nPrompt sent to GPT-4: {prompt}\n")
+    
+    messages = [
+        {"role": "system", "content": intro + explanation},
+        {"role": "user", "content": patch_info + task_headline + task_list},
+    ]
 
-    response = openai.Completion.create(
-        engine=model,
-        prompt=prompt,
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
         temperature=0.55,
         max_tokens=312,
         top_p=1,
         frequency_penalty=0.3,
         presence_penalty=0.0,
     )
-    review = response["choices"][0]["text"]
+    review = response["choices"][0]["message"]["content"]
 
     data = {"body": review, "commit_id": GIT_COMMIT_HASH, "event": "COMMENT"}
     data = json.dumps(data)
