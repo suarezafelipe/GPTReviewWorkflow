@@ -29,8 +29,8 @@ def get_review():
     print(f"\nPrompt sent to GPT-4: {prompt}\n")
     
     messages = [
-        {"role": "system", "content": intro + explanation},
-        {"role": "user", "content": patch_info + task_headline + task_list},
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": intro + explanation + patch_info + task_headline + task_list},
     ]
 
     response = openai.ChatCompletion.create(
