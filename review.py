@@ -36,7 +36,7 @@ def get_review():
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
-        temperature=0.9,
+        temperature=0.56,
         max_tokens=312,
         top_p=1,
         frequency_penalty=0.3,
