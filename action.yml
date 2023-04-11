@@ -1,5 +1,5 @@
-name: 'GPTReviewWorkflow'
-description: 'GPT-3 reviews your PR'
+name: 'GPT4ReviewWorkflow'
+description: 'GPT-4 reviews your PR'
 branding:
   icon: 'eye'
   color: 'gray-dark'
@@ -61,4 +61,3 @@ runs:
           OPENAI_ORG_KEY: ${{ inputs.OPENAI_ORG_KEY }} 
           PR_TITLE: ${{ inputs.PR_TITLE }}
           GIT_PATCH_OUTPUT: ${{ inputs.GIT_PATCH_OUTPUT }}
-
