@@ -18,8 +18,15 @@ def get_review():
         "authorization": f"Bearer {ACCESS_TOKEN}",
     }
     
-    # Fetch the patch file content
+    
+     # Fetch the patch file content
+    print(f"Fetching patch file content from: {PR_PATCH_URL}\n")
     patch_response = requests.get(PR_PATCH_URL, headers=headers)
+        
+    if patch_response.status_code != 200:
+        print(f"Error fetching patch file: {patch_response.status_code} - {patch_response.text}")
+        return
+
     PR_PATCH = patch_response.text
     
     patch_info = f"Is there a better way to write this code? \n\n{PR_PATCH}\n"    
