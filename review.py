@@ -18,25 +18,20 @@ def get_review():
         "Accept": "application/vnd.github.v3.patch",
         "authorization": f"Bearer {ACCESS_TOKEN}",
     }
+    
+    patch_info = f"Is there a better way to write this code? \n\n{PR_PATCH}\n"    
 
-    intro = f"Act as a code reviewer of a Pull Request, providing feedback on the code changes below. You are provided with the Pull Request changes in a patch format.\n"
-    explanation = f"Each patch entry has the commit message in the Subject line followed by the code changes (diffs) in a unidiff format.\n"
-    patch_info = f"Patch of the Pull Request to review:\n\n{PR_PATCH}\n"
-    task_headline = f"As a code reviewer, your task is:\n"
-    task_list = f"- Review the code changes (diffs) in the provided patch and provide feedback.\n- Don't look at other code to review other than the provided patch.\n- If you don't have enough information to provide accurate feedback, please say 'No comments' or provide a very brief response based on the information available.'\n- If there are any bugs, highlight them.\n- Do not highlight minor issues and nitpicks.\n- View this as one pull request and don't mention individual patches.\n- Look out for typos in repeating variables only in the patch files.\n- Use markdown formatting.\n- Use bullet points if you have multiple comments.\n"
-    prompt = intro + explanation + patch_info + task_headline + task_list
-
-    print(f"\nPrompt sent to GPT-4: {prompt}\n")
+    print(f"\nPrompt sent to GPT-4: {patch_info}\n")
     
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": intro + explanation + patch_info + task_headline + task_list},
+        {"role": "user", "content": patch_info},
     ]
 
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
-        temperature=0.56,
+        temperature=0.4,
         max_tokens=312,
         top_p=1,
         frequency_penalty=0.3,
