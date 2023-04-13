@@ -7,7 +7,6 @@ import openai
 def get_review():
     ACCESS_TOKEN = os.getenv("GITHUB_TOKEN")
     GIT_COMMIT_HASH = os.getenv("GIT_COMMIT_HASH")
-    PR_PATCH_URL = os.getenv("GIT_PATCH_OUTPUT")
     model = "gpt-4-0314"
     openai.api_key = os.getenv("OPENAI_API_KEY")
     openai.organization = os.getenv("OPENAI_ORG_KEY")
@@ -18,11 +17,24 @@ def get_review():
         "authorization": f"Bearer {ACCESS_TOKEN}",
     }
     
-    
-     # Fetch the patch file content
+    OWNER = pr_link.split("/")[-4]
+    REPO = pr_link.split("/")[-3]
+    PR_NUMBER = pr_link.split("/")[-1]
+
+    # Get the pull request details
+    pr_details_url = f"https://api.github.com/repos/{OWNER}/{REPO}/pulls/{PR_NUMBER}"
+    pr_details_response = requests.get(pr_details_url, headers=headers)
+    if pr_details_response.status_code != 200:
+        print(f"Error fetching pull request details: {pr_details_response.status_code} - {pr_details_response.text}")
+        return
+
+    pr_details = pr_details_response.json()
+    PR_PATCH_URL = pr_details["_links"]["patch"]["href"]
+
+    # Fetch the patch file content
     print(f"Fetching patch file content from: {PR_PATCH_URL}\n")
     patch_response = requests.get(PR_PATCH_URL, headers=headers)
-        
+    
     if patch_response.status_code != 200:
         print(f"Error fetching patch file: {patch_response.status_code} - {patch_response.text}")
         return
