@@ -1,14 +1,13 @@
 import os
 import requests
 import json
-import subprocess  # is this still needed?
 import openai
 
 
 def get_review():
     ACCESS_TOKEN = os.getenv("GITHUB_TOKEN")
     GIT_COMMIT_HASH = os.getenv("GIT_COMMIT_HASH")
-    PR_PATCH = os.getenv("GIT_PATCH_OUTPUT")
+    PR_PATCH_URL = os.getenv("GIT_PATCH_OUTPUT")
     model = "gpt-4-0314"
     openai.api_key = os.getenv("OPENAI_API_KEY")
     openai.organization = os.getenv("OPENAI_ORG_KEY")
@@ -18,6 +17,10 @@ def get_review():
         "Accept": "application/vnd.github.v3.patch",
         "authorization": f"Bearer {ACCESS_TOKEN}",
     }
+    
+    # Fetch the patch file content
+    patch_response = requests.get(PR_PATCH_URL, headers=headers)
+    PR_PATCH = patch_response.text
     
     patch_info = f"Is there a better way to write this code? \n\n{PR_PATCH}\n"    
 
