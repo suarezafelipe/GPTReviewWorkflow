@@ -27,6 +27,12 @@ def get_review():
     if pr_details_response.status_code != 200:
         print(f"Error fetching pull request details: {pr_details_response.status_code} - {pr_details_response.text}")
         return
+    else:
+        try:
+            pr_details = pr_details_response.json()
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON: {pr_details_response.text}")
+            return
 
     pr_details = pr_details_response.json()
     PR_PATCH_URL = pr_details["_links"]["patch"]["href"]
