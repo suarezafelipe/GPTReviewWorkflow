@@ -21,33 +21,14 @@ def get_review():
     REPO = pr_link.split("/")[-3]
     PR_NUMBER = pr_link.split("/")[-1]
 
-    # Get the pull request details
+    # Get the patch of the pull request
     pr_details_url = f"https://api.github.com/repos/{OWNER}/{REPO}/pulls/{PR_NUMBER}"
     pr_details_response = requests.get(pr_details_url, headers=headers)
     if pr_details_response.status_code != 200:
         print(f"Error fetching pull request details: {pr_details_response.status_code} - {pr_details_response.text}")
         return
-    else:
-        try:
-            pr_details = pr_details_response.json()
-        except json.JSONDecodeError:
-            print(f"Error decoding JSON: {pr_details_response.text}")
-            return
-
-    pr_details = pr_details_response.json()
-    PR_PATCH_URL = pr_details["_links"]["patch"]["href"]
-
-    # Fetch the patch file content
-    print(f"Fetching patch file content from: {PR_PATCH_URL}\n")
-    patch_response = requests.get(PR_PATCH_URL, headers=headers)
-    
-    if patch_response.status_code != 200:
-        print(f"Error fetching patch file: {patch_response.status_code} - {patch_response.text}")
-        return
-
-    PR_PATCH = patch_response.text
-    
-    patch_info = f"Is there a better way to write this code? \n\n{PR_PATCH}\n"    
+      
+    patch_info = f"Is there a better way to write this code? \n\n{pr_details_response.text}\n"    
 
     print(f"\nPrompt sent to GPT-4: {patch_info}\n")
     
