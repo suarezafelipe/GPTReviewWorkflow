@@ -27,14 +27,19 @@ def get_review():
     if pr_details_response.status_code != 200:
         print(f"Error fetching pull request details: {pr_details_response.status_code} - {pr_details_response.text}")
         return
-      
-    patch_info = f"Is there a better way to write this code? \n\n{pr_details_response.text}\n"    
+        
+    intro = f"Act as a code reviewer of a Pull Request, providing feedback on the code changes below. You are provided with the Pull Request changes in a patch format.\n"
+    explanation = f"Each patch entry has the commit message in the Subject line followed by the code changes (diffs) in a unidiff format.\n"
+    patch_info = f"Patch of the Pull Request to review:\n\n{pr_details_response.text}\n"
+    task_headline = f"As a code reviewer, your task is:\n"
+    task_list = f"- Review the code changes (diffs) and provide feedback.\n- If you don't have enough information to provide accurate feedback, please say 'Looks good to me' or provide a very brief response based on the information available.'\n- If there are any bugs, highlight them.\n- Do not highlight minor issues and nitpicks.\n- View this as one pull request and don't mention individual patches.\n- Look out for typos in repeating variables only in the patch files.\n- Use markdown formatting.\n- Use bullet points if you have multiple comments.\n"
+    prompt = intro + explanation + task_headline + task_list + patch_info
 
-    print(f"\nPrompt sent to GPT-4: {patch_info}\n")
+    print(f"\nPrompt sent to GPT-4: {prompt}\n")
     
     messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": patch_info},
+        {"role": "system", "content": "You are an experienced but nice and humble software developer."},
+        {"role": "user", "content": prompt},
     ]
 
     response = openai.ChatCompletion.create(
