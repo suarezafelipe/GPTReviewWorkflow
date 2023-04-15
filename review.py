@@ -7,7 +7,7 @@ import openai
 def get_review():
     ACCESS_TOKEN = os.getenv("GITHUB_TOKEN")
     GIT_COMMIT_HASH = os.getenv("GIT_COMMIT_HASH")
-    model = "gpt-4-0314"
+    model = "gpt-4-32k"
     openai.api_key = os.getenv("OPENAI_API_KEY")
     openai.organization = os.getenv("OPENAI_ORG_KEY")
     pr_link = os.getenv("LINK")
@@ -32,13 +32,13 @@ def get_review():
     explanation = f"Each patch entry has the commit message in the Subject line followed by the code changes (diffs) in a unidiff format.\n"
     patch_info = f"Patch of the Pull Request to review:\n\n{pr_details_response.text}\n"
     task_headline = f"As a code reviewer, your task is:\n"
-    task_list = f"- Review the code changes (diffs) and provide feedback.\n- If you don't have enough information to provide accurate feedback, please say 'Looks good to me' or provide a very brief response based on the information available.'\n- If there are any bugs, highlight them.\n- Do not highlight minor issues and nitpicks.\n- View this as one pull request and don't mention individual patches.\n- Look out for typos in repeating variables only in the patch files.\n- Use markdown formatting.\n- Use bullet points if you have multiple comments.\n"
+    task_list = f"- Review the code changes (diffs) and provide feedback.\n- If you don't have enough information to provide accurate feedback, refrain from making up responses.'\n- If there are any bugs, highlight them.\n- Do not highlight minor issues and nitpicks.\n- View this as one pull request and don't mention individual patches.\n- Look out for typos in repeating variables only in the patch files.\n- Use markdown formatting.\n- Use bullet points if you have multiple comments.\n"
     prompt = intro + explanation + task_headline + task_list + patch_info
 
     print(f"\nPrompt sent to GPT-4: {prompt}\n")
     
     messages = [
-        {"role": "system", "content": "You are an experienced but nice and humble software developer."},
+        {"role": "system", "content": "You are an experienced and humble software developer."},
         {"role": "user", "content": prompt},
     ]
 
