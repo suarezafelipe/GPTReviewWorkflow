@@ -27,25 +27,97 @@ def get_review():
     if pr_details_response.status_code != 200:
         print(f"Error fetching pull request details: {pr_details_response.status_code} - {pr_details_response.text}")
         return
-        
-    intro = f"Act as a code reviewer of a Pull Request, providing feedback on the code changes below. You are provided with the Pull Request changes in a patch format.\n"
-    explanation = f"Each patch entry has the commit message in the Subject line followed by the code changes (diffs) in a unidiff format.\n"
-    patch_info = f"Patch of the Pull Request to review:\n\n{pr_details_response.text}\n"
-    task_headline = f"As a code reviewer, your task is:\n"
-    task_list = f"- Review the code changes (diffs) and provide feedback.\n- If you don't have enough information to provide accurate feedback, refrain from making up responses.'\n- If there are any bugs, highlight them.\n- Do not highlight minor issues and nitpicks.\n- View this as one pull request and don't mention individual patches.\n- Look out for typos in repeating variables only in the patch files.\n- Use markdown formatting.\n- Use bullet points if you have multiple comments.\n"
-    prompt = intro + explanation + task_headline + task_list + patch_info
+    
+    complete_prompt = '''    
+    Act as a code reviewer of a Pull Request, providing feedback on the code changes below. You are provided with the Pull Request changes in a patch format.
+    Each patch entry has the commit message in the Subject line followed by the code changes (diffs) in a unidiff format.    
+    The above format for changes consists of multiple patches of code changes. 
+    Each patch contains the files and the lines that were removed and the lines that were added. 
+    Take into account that the lines that were removed or added may not be contiguous.
+    The last patch might modify previously modified lines, so take always the last patch where a line was modified
+    as the final version of the line.
+    Important instructions:
+    - Your task is to do a line by line review of new hunks and point out 
+      substantive issues in those line ranges. For each issue you 
+      identify, please provide the exact line range (inclusive) where 
+      the issue occurs.
+    - Only respond in the below response format (consisting of review
+      sections) and nothing else. Each review section must consist of a line 
+      range and a review comment for that line range. Optionally, 
+      you can include a single replacement suggestion snippet and/or multiple 
+      new code snippets in the review comment. There's a separator between review 
+      sections.
+    - Use Markdown format for review comment text.
+    - Fenced code blocks must be used for new content and replacement 
+      code/text snippets.  
+    - Replacement code/text snippets must be complete and correctly 
+      formatted. Each replacement suggestion must be provided as a separate review 
+      section with relevant line number ranges.  
+    - If needed, suggest new code using the correct language identifier in the 
+      fenced code blocks. These snippets may be added to a different file, such 
+      as test cases. Multiple new code snippets are allowed within a single 
+      review section.
+    - Do not annotate code snippets with line numbers inside the code blocks.
+    - If there are no substantive issues detected at a line range, simply 
+      comment "LGTM!" for the respective line range in a review section and 
+      avoid additional commentary/compliments.
+    - Review your comments and line ranges at least 3 times before sending 
+      the final response to ensure accuracy of line ranges and replacement
+      snippets.
+    Response format expected:
+      <start_line_number>-<end_line_number>:
+      <review comment>
+      ---
+      <start_line_number>-<end_line_number>:
+      <review comment>
+      \`\`\`suggestion
+      <code/text that replaces everything between start_line_number and end_line_number>
+      \`\`\`
+      ---
+      <start_line_number>-<end_line_number>:
+      <review comment>
+      \`\`\`<language>
+      <new code snippet>
+      \`\`\`
+      ---
+      ...
+    Example changes:
+      ---new_hunk---
+      1: def add(x, y):
+      2:     z = x+y
+      3:     retrn z
+      4:
+      5: def multiply(x, y):
+      6:     return x * y
+      
+      ---old_hunk---
+      def add(x, y):
+          return x + y
+    Example response:
+      3-3:
+      There's a typo in the return statement.
+      \`\`\`suggestion
+          return z
+      \`\`\`
+      ---
+      5-6:
+      LGTM!
+      ---
+    The patch or patches for review are below:    
+    '''
+    prompt = complete_prompt + pr_details_response.text
 
     print(f"\nPrompt sent to GPT-4: {prompt}\n")
     
     messages = [
-        {"role": "system", "content": "You are an experienced and humble software developer."},
+        {"role": "system", "content": "You are an experienced software developer."},
         {"role": "user", "content": prompt},
     ]
 
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
-        temperature=0.4,
+        temperature=0.1,
         max_tokens=312,
         top_p=1,
         frequency_penalty=0.3,
