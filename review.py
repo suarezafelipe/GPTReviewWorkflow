@@ -3,7 +3,6 @@ import requests
 import json
 import openai
 
-
 def get_review():
     ACCESS_TOKEN = os.getenv("GITHUB_TOKEN")
     GIT_COMMIT_HASH = os.getenv("GIT_COMMIT_HASH")
@@ -127,7 +126,7 @@ def get_review():
     except openai.error.RateLimitError as e:
         print(f"RateLimitError: {e}")
         print("You have exceeded your current quota. Please check your plan and billing details.")
-        sys.exit(0)
+        return
         
     review = response["choices"][0]["message"]["content"]
 
