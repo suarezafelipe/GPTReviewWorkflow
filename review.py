@@ -114,15 +114,21 @@ def get_review():
         {"role": "user", "content": prompt},
     ]
 
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=messages,
-        temperature=0.1,
-        max_tokens=312,
-        top_p=1,
-        frequency_penalty=0.3,
-        presence_penalty=0.6,
-    )
+    try:
+        response = openai.ChatCompletion.create(
+            model=model,
+            messages=messages,
+            temperature=0.1,
+            max_tokens=312,
+            top_p=1,
+            frequency_penalty=0.3,
+            presence_penalty=0.6,
+        )
+    except openai.error.RateLimitError as e:
+        print(f"RateLimitError: {e}")
+        print("You have exceeded your current quota. Please check your plan and billing details.")
+        sys.exit(0)
+        
     review = response["choices"][0]["message"]["content"]
 
     data = {"body": review, "commit_id": GIT_COMMIT_HASH, "event": "COMMENT"}
