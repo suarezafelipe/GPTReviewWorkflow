@@ -110,6 +110,13 @@ def get_review():
         print(f"RateLimitError: {e}")
         print("You have exceeded your current quota. Please check your plan and billing details.")
         return
+    except openai.error.InvalidRequestError as e:
+        print(f"InvalidRequestError: {e}")
+        print("Your request is invalid. Please check the input and try again.")
+        return
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return
         
     review = response["choices"][0]["message"]["content"]
 
