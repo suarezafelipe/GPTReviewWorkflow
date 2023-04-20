@@ -63,23 +63,8 @@ def get_review():
     - Review your comments and line ranges at least 3 times before sending 
       the final response to ensure accuracy of line ranges and replacement
       snippets.
-    Response format expected:
-      <start_line_number>-<end_line_number>:
-      <review comment>
-      ---
-      <start_line_number>-<end_line_number>:
-      <review comment>
-      \`\`\`suggestion
-      <code/text that replaces everything between start_line_number and end_line_number>
-      \`\`\`
-      ---
-      <start_line_number>-<end_line_number>:
-      <review comment>
-      \`\`\`<language>
-      <new code snippet>
-      \`\`\`
-      ---
-      ...
+    - If you have multiple comments, use a bullet list. Remember you can 
+      use markdown in your answers. 
     Example changes:
       ---new_hunk---
       1: def add(x, y):
@@ -93,14 +78,12 @@ def get_review():
       def add(x, y):
           return x + y
     Example response:
-      3-3:
-      There's a typo in the return statement.
+      - There's a typo in the return statement.
       \`\`\`suggestion
           return z
       \`\`\`
       ---
-      5-6:
-      LGTM!
+      LGTM
       ---
     The patch or patches for review are below:    
     '''
