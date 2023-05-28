@@ -101,7 +101,7 @@ def get_review():
             model=model,
             messages=messages,
             temperature=0.1,
-            max_tokens=312,
+            max_tokens=8192,
             top_p=1,
             frequency_penalty=0.3,
             presence_penalty=0.6,
